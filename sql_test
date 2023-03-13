@@ -1,0 +1,449 @@
+DROP TABLE IF EXISTS [##na_xs], [##dnb_csad], [##na_xs_duns], [##Quart_Refresh_Policy_Cust_Number_Mapping],
+[##HLE_5_YR_PO], [##HLE_5_YR_P1], [##HLE_5_YR_P2], [##HLE_5_YR_P3],
+[##Quart_Refresh_Duns_Cust_Number_Mapp], [##HLE_5_YR_PA],
+[##HLE_5_YR_SIC_2Digit_PO], [##HLE_5_YR_SIC_2Digit_P1], [##HLE_5_YR_SIC_2Digit_P2], 
+[##HLE_5_YR_SIC_2Digit_P3], [##HLE_5_YR_SIC_2Digit_P4], [##HLE_5_YR_SIC_2Digit_Lag], [##HLE_5_YR_Lag]
+
+DECLARE @reference_date DATE
+SET @reference_date = GETDATE()
+
+DECLARE @fixed_reference_date DATE
+SET @fixed_reference_date = '2019-12-31'
+
+SELECT a.plcy_nbr, a.plcy_eff_dt, a.plcy_expr_dt,
+a.insured_nme, a.d_insured_address, a.d_insured_city, a.d_insured_state, a.d_insured_zip, a.d_ee_premium_usd, a.d_ee_claim_cnt,
+a.d_ee_gt0_claim_cnt, a.d_ee_st1000_claim_cnt, a.d_ee_loss_amt_usd, cd_final_insured_duns_nbr, 
+CASE 
+    WHEN a.plcy_uw_year = 2022 AND a.plcy_eff_dt < '2022-05-30' THEN 'SEP21'
+    WHEN a.plcy_uw_year = 2022 AND a.plcy_eff_dt < '2022-11-30' THEN 'MAR22'
+    WHEN a.plcy_uw_year = 2022 AND a.plcy_eff_dt < '2022-12-31' THEN 'SER22'
+    WHEN a.plcy_uw_year = 2021 AND a.plcy_eff_dt < '2021-05-30' THEN 'SEP20'
+    WHEN a.plcy_uw_year = 2021 AND a.plcy_eff_dt < '2021-11-30' THEN 'MAR21'
+    WHEN a.plcy_uw_year = 2021 AND a.plcy_eff_dt <= '2021-12-31' THEN 'SEP21'
+    WHEN a.plcy_uw_year = 2020 AND a.plcy_eff_dt < '2020-05-30' THEN 'SEP19'
+    WHEN a.plcy_uw_year = 2020 AND a.plcy_eff_dt < '2020-11-30' THEN 'MAR20'
+    WHEN a.plcy_uw_year = 2020 AND a.plcy_eff_dt <= '2020-12-31' THEN 'SEP20'
+    WHEN a.plcy_uw_year = 2019 AND a.plcy_eff_dt < '2019-05-30' THEN 'SEP18'
+    WHEN a.plcy_uw_year = 2019 AND a.plcy_eff_dt < '2019-11-30' THEN 'MAR19'
+    WHEN a.plcy_uw_year = 2019 AND a.plcy_eff_dt <= '2019-12-31' THEN 'SEP19'
+    WHEN a.plcy_uw_year = 2018 AND a.plcy_eff_dt < '2018-05-30' THEN 'SEP17'
+    WHEN a.plcy_uw_year = 2018 AND a.plcy_eff_dt < '2018-11-30' THEN 'MAR18'
+    WHEN a.plcy_uw_year = 2018 AND a.plcy_eff_dt <= '2018-12-31' THEN 'SEP18'
+    WHEN a.plcy_uw_year = 2017 AND a.plcy_eff_dt < '2017-05-30' THEN 'SEP16'
+    WHEN a.plcy_uw_year = 2017 AND a.plcy_eff_dt < '2017-11-30' THEN 'MAR17'
+    WHEN a.plcy_uw_year = 2017 AND a.plcy_eff_dt <= '2017-12-31' THEN 'SEP17'
+    WHEN a.plcy_uw_year = 2016 AND a.plcy_eff_dt < '2016-05-30' THEN 'SEP15'
+    WHEN a.plcy_uw_year = 2016 AND a.plcy_eff_dt < '2016-11-30' THEN 'MAR16'
+    WHEN a.plcy_uw_year = 2016 AND a.plcy_eff_dt >= '2016-12-31' THEN 'SEP16'
+    WHEN a.plcy_uw_year = 2015 AND a.plcy_eff_dt < '2015-05-30' THEN 'SEP14'
+    WHEN a.plcy_uw_year = 2015 AND a.plcy_eff_dt = '2015-11-30' THEN 'MAR15'
+    WHEN a.plcy_uw_year = 2015 AND a.plcy_eff_dt <= '2015-12-31' THEN 'SEP15'
+    WHEN a.plcy_uw_year = 2014 AND a.plcy_eff_dt = '2014-05-30' THEN 'SEP13'
+    WHEN a.plcy_uw_year = 2014 AND a.plcy_eff_dt < '2014-11-30' THEN 'MAR14'
+    WHEN a.plcy_uw_year = 2014 AND a.plcy_eff_dt <= '2014-12-31' THEN 'SEP14'
+    WHEN a.plcy_uw_year = 2013 AND a.plcy_eff_dt < '2013-05-30' THEN 'SEP12'
+    WHEN a.plcy_uw_year = 2013 AND a.plcy_eff_dt < '2013-11-30' THEN 'MAR13'
+    WHEN a.plcy_uw_year = 2013 AND a.plcy_eff_dt <= '2013-12-31' THEN 'SEP13'
+    WHEN a.plcy_uw_year = 2012 AND a.plcy_eff_dt = '2012-05-30' THEN 'SEP11'
+    WHEN a.plcy_uw_year = 2012 AND a.plcy_eff_dt < '2012-11-30' THEN 'MAR12'
+    WHEN a.plcy_uw_year = 2012 AND a.plcy_eff_dt <= '2012-12-31' THEN 'SEP12'
+    WHEN a.plcy_uw_year = 2011 AND a.plcy_eff_dt = '2011-05-30' THEN 'SEP10'
+    WHEN a.plcy_uw_year = 2011 AND a.plcy_eff_dt = '2011-11-30' THEN 'MAR11'
+    WHEN a.plcy_uw_year = 2011 AND a.plcy_eff_dt <= '2011-12-31' THEN 'SEPT11'
+    WHEN a.plcy_uw_year = 2010 AND a.plcy_eff_dt = '2010-05-30' THEN 'SEPO9'
+    WHEN a.plcy_uw_year = 2010 AND a.plcy_eff_dt = '2010-11-30' THEN 'MAR10'
+    WHEN a.plcy_uw_year = 2010 AND a.plcy_eff_dt <= '2010-12-31' THEN 'SEP10'
+    WHEN a.plcy_uw_year = 2009 AND a.plcy_eff_dt < '2009-05-30' THEN 'SEPO8'
+    WHEN a.plcy_uw_year = 2009 AND a.plcy_eff_dt < '2009-11-30' THEN 'MAR09'
+    WHEN a.plcy_uw_year = 2009 AND a.plcy_eff_dt <= '2009-12-31' THEN 'SEP09'
+    WHEN a.plcy_uw_year = 2008 and a.plcy_eff_dt < '2008-05-30' then 'SEP07'
+    WHEN a.plcy_uw_year = 2008 and a.plcy_eff_dt < '2008-11-30' then 'MAR08'
+    WHEN a.plcy_uw_year = 2008 and a.plcy_eff_dt <= '2008-12-31' then 'SEP08'
+    WHEN a.plcy_uw_year = 2007 and a.plcy_eff_dt < '2007-05-30' then 'SEP06'
+    WHEN a.plcy_uw_year = 2007 and a.plcy_eff_dt < '2007-11-30' then 'MAR07'
+    WHEN a.plcy_uw_year = 2007 and a.plcy_eff_dt <= '2007-12-31' then 'SEP07'
+        else 't' 
+    end as DATEPLL,
+    d.d_final_customerKey,
+    dateadd(day, -0*366, @reference_date) as plcy_eff_dt_PO,
+    dateadd(day, -1*366, @reference_date) as plcy_eff_dt_P1,
+    dateadd(day, -2*366, @reference_date) as plcy_eff_dt_P2,
+    dateadd(day, -3*366, @reference_date) as plcy_eff_dt_P3,
+    dateadd(day, -4*366, @reference_date) as plcy_eff_dt_P4,
+    dateadd(day, -1826-0*366, @reference_date) as CutoffDate5YR_PO,
+    dateadd(day, -1826-1*366, @reference_date) as CutoffDate5YR_P1,
+    dateadd(day, -1826-2*366, @reference_date) as CutoffDate5YR_P2,
+    dateadd(day, -1826-3*366, @reference_date) as CutoffDate5YR_P3,
+    dateadd(day, -1826-4*366, @reference_date) as CutoffDate5YR_P4
+into ##na_xs
+from [Modeling_analytics].StAR.v_rel_ee_policy as a
+left join [StAR].[V_REL_EE_Policy_Insured_Address] as c
+    on a.plcy_nbr = c.picy_nbr and a.plcy_eff_dt = c.picy_eff_dt
+inner join [Modeling_analytics].StAR.V_REL_EE_Customer_Policy_Link as d
+    on a.plcy_nbr = d.plcy_nbr
+where 
+    ad_ee_Primary_PLOB in (
+        'NA XS - NA XS Liab Non Energy',
+        'NA XS - ROW X5 Liab Non Energy',
+        'Lon WS Casualty XS - Non DUA',
+        'NA XS - Bermuda, XS Liab NonEgy',
+        'NA Const - X5 Const',
+        'NA E8S - XS Liab Non Energy'
+    )
+    and a.d_ee_premium_usd > 0
+    and a.plcy_uw_year > -2011
+    and a.d_ee_LimitAttachmentPoint_USD >= 10000000
+    and a.d_insured_country_code = 'US'
+SELECT [DUNS NUMBER], DATEPLL, SIC4
+FROM ext.DNB_RAW_BRICK_CSAD_2022
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SIC4
+FROM ext.DNB_RAW_BRICK_CSAD_2021
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SIC4
+FROM ext.DNB_RAW_BRICK_SAD_2020
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SIC4
+FROM ext.DNB_RAW_BRICK_CSAD_2019
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SIC4
+FROM ext.DNB_RAW_BRICK_CSAD_2018
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_nbr FROM ##na_x5)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SICA
+FROM ext.DNB_RAW_BRICK_CSAD_2017
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SICA
+FROM ext.DNB_RAW_BRICK_CSAD_2016
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_nbr FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SICA
+FROM ext.DNB_RAW_BRICK_CSAD_2015
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs)
+UNION
+SELECT [DUNS NUMBER], DATEPLL, SIC4
+FROM ext.DNB_RAW_BRICK_CSAD_2014
+WHERE [DUNS NUMBER] IN (SELECT DISTINCT d_final_insured_duns_br FROM ##na_xs);
+union
+
+select [DUNS NUMBER], DATEPLL, SIC4
+from ext.DNB_RAW_BRICK_CSAD_2013
+where [DUNS NUMBER] in (select distinct d_final_insured_duns_br from ##na_xs)
+
+union
+
+select [DUNS NUMBER], DATEPLL, SIC4
+from ext.DNB_RAW_BRICK_CSAD_2012
+where [DUNS NUMBER] in (select distinct d_final_insured_duns_br from ##na_xs)
+
+union
+
+select [DUNS NUMBER], DATEPLL, SICA
+from ext.DNB_RAW_BRICK_CSAD_2011
+where [DUNS NUMBER] in (select distinct d_final_insured_duns_nbr from ##na_x5)
+
+into ##na_x_duns
+
+from (
+	select distinct d_final_insured_duns_br, DATEPLL
+	from ##na_xs
+) as a
+
+left join ##dnb_csad as b on a.d a.d_final_insured_duns_nbr = b.[DUNS NUMBER] and
+
+a.DATEPLL = b.DATEPLL
+
+select distinct plcy_nbr, d_final_customerKey 
+into ##Quart_Refresh_Policy_Cust_Number_Mapping 
+from ##na_xs_duns;
+
+******Policy Customer Key Mapping*****
+
+select distinct d_final_insured_duns_nbr, d_final_customerKey 
+into ##Quart_Refresh_Duns_Cust_Number_Mapping 
+from ##na_xs_duns 
+where d_final_insured_duns_nbr <> '';
+
+***HLE Customer Key Level*****
+
+select d_final_customerKey, 
+coalesce(sum(d_ee_gt1000_claim_cnt) / sum(d_ee_premium_usd),0) as -HLE_Gt1000Freq_5YR_PO 
+into ##HLE_S_YR_PO 
+from 
+(select a.plcy_nbr, 
+a.plcy_eff_dt, 
+a.CutoffDate5YR_PO, 
+a.d_final_customerKey, 
+a.d_ee_premium_usd, 
+a.d_ee_gt1000_claim_cnt 
+from ##na_xs_duns as a 
+where a.plcy_eff_dt <= a.plcy_eff_dt_P0 
+and a.plcy_eff_dt >= a.CutoffDate5YR_PO 
+and a.d_final_customerkey is not NULL) as a 
+group by d_final_customerKey;
+
+select d_final_customerKey, 
+coalesce(sum(d_ee_gt1000_claim_cnt) / sum(d_ee_premium_usd),0) as HLE_Gt1000Freq_5YR_P1 
+into ##HLE_5_YR_P1 
+from 
+(select a.plcy_nbr, 
+a.plcy_eff_dt, 
+a.CutoffDate5YR_PO, 
+a.d_final_customerKey, 
+a.d_ee_premium_usd, 
+a.d_ee_gt1000_claim_cnt 
+from ##na_xs_duns as a 
+where a.plcy_eff_dt <= a.plcy_eff_dt_P0 
+and a.plcy_eff_dt >= a.CutoffDate5YR_PO 
+and a.d_final_customerkey is not NULL) as a 
+group by d_final_customerKey,
+coalesce(sum (d_ee_gt1000_claim_cnt) / sum (d_ee_premium_usd),0) as HLE_Gt1000Freq_5YR_P1 into ##HLE_5_YR_P1
+
+from (
+select a plcy_nbr,
+a.plcy_eff_dt,
+a.CutoffDateSYR_P1,
+a_d_final_customerKey,
+a.d_ee_premium_usd,
+a.d_ee_gt1000_claim_cnt
+from ##na_xs_duns as a
+where a plcy_eff_dt <= a.plcy_eff_dt_P1 and a.plcy_eff_dt >= a.CutoffDate5YR_P1 and a.d_final_customerkey is not NULL) as a group by d_final_customerKey
+Eselect d_final_customerkey,
+coalesce(sum(d_ee_gt1000_claim_cnt) / sum(d_ee_premium_usd),0) as HLE_Gt1000Freq_5YR_P2
+into ##HLE_5_YR_P2
+from
+select a plcy_nbr,
+a.plcy_eff_dt,
+a.CutoffDate5YR_P2,
+a.d_final_customerKey, a.d_ee_premium_usd,
+a.d_ee_gt1000_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= a.plcy_eff_dt_P2 and a.plcy_eff_dt >= a.CutoffDate5YR_P2 and a.d_final_customerkey is not NULL) as a group by d_final_customerKey
+select d_final_customerKey,
+coalesce(sum(d_ee_gt1000_claim_cnt) / sum (d_ee_premium_usd),0) as HLE_Gt1000Freq_5YR_P3
+into ##HLE_5_YR_P3 from (
+select a.plcy_nbr,
+a.plcy_eff_dt,
+a.CutoffDate5YR_P3,
+a.d_final_customerKey,
+a.d_ee_premium_usd,
+a.d_ee_gt1000_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= a.plcy_eff_dt_P3 and a.plcy_eff_dt >= a.CutoffDate5YR_P3 and a.d_final_customerKey is not NULL) as a group by d_final_customerKey
+select d_final_customerKey,
+coalesce(sum(d_ee_gt1000_claim_cnt) / sum(d_ee_premium_usd),0) as HLE_Gt1000Freq_5YR_P4
+into ##HLE_5_YR_P4
+from (
+select a.plcy_nbr,
+a.plcy_eff_dt,
+a.CutoffDate5YR_P4, a.d_final_customerKey, a.d_ee_premium_usd,
+a.d_ee_gt1000_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt. <= a.plcy_eff_dt_P4., and a.plcy_eff_dt >= a. CutoffDate5YR_P4 and a.d_final_customerKey is not NULL) as a group by d_final_customerKey
+********HLE DnB SIC Level******
+select PRIMARY_SIC_2,
+coalesce(sum(d_ee_claim_cnt) / sum(d_ee_premium_usd),0) as SIC_2Digit_HLE_Not Freq_5YR_PO into ##HLE_5_YR_SIC_2Digit_PO from (
+select a.plcy_nbr,
+a.plcy_eff_dt,
+a.PRIMARY_SIC_2,
+a.d_ee_premium_usd.,
+a.d_ee_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= (case when a.plcy_eff_dt_PO > @fixed_reference_date then @fixed_reference_date else a.plcy_eff_dt_P0 end) and a.plcy_eff_dt >= (case when a plcy_eff_dt_PO > @fixed_reference_date then dateadd(day, -1826, @fixed_reference_date) else a CutoffDate5YR PO end)
+a. PRIMARY SIC_2 is not NULL
+as a
+group by PRIMARY_SIC_2
+select PRIMARY_SIC_2,
+and
+coalesce(sum(d_ee_claim_cnt) / sum(d_ee_premium_usd),0) as SIC_2Digit_HLE_Not Freq_5YR_P1
+into ##HLE_5_YR_SIC_2Digit_P1
+from
+select a plcy_nbr,
+a.plcy_eff_dt,
+a.PRIMARY_SIC_2,
+a.d_ee premium_usd,
+a.d_ee_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= (case when a.plcy_eff_dt_P1 > @fixed_reference_date then @fixed_reference_date else a.plcy_eff_dt_P1 end) and a.plcy_eff_dt >= (case when a.plcy_eff_dt_P1> @fixed_reference_date then dateadd(day, -1826, @fixed_reference_date) else a.CutoffDate5YR_P1 end) and a.PRIMARY_SIC_2 is not NULL
+) as a
+group by PRIMARY_SIC_2
+select PRIMARY SIC_2
+coalesce(sum(d_ee_claim_cnt) / sum(d_ee_premium_usd),0) as SIC_2Digit_HLE_Not Freq_5YR_P2 into ##HLE_5_YR_SIC_2Digit_P2
+from
+select a.plcy_nbr,
+a.plcy_eff_dt,
+a. PRIMARY_SIC_2, a.d_ee_premium_usd, a.d_ee_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= (case when a.plcy_eff_dt_P2 > @fixed_reference_date then @fixed_reference_date else a.plcy_eff_dt_P2 end) and a.plcy_eff_dt >= (case when a.plcy_eff_dt_P2 > @fixed_reference_date then dateadd(day, -1826, @fixed_reference_date) else a.CutoffDate5YR_P2 end) and
+a PRIMARY SIC 2 is not NULL
+as a
+group by PRIMARY_SIC_2
+select PRIMARY SIC_2,
+coalesce(sum(d_ee_claim_cnt) / sum(d_ee_premium_usd),0) as SIC_2Digit_HLE_Not Freq_5YR_P3
+into ##HLE_5_YR_SIC_2Digit_P3
+from (
+select a.plcy_nbr,
+a.plcy_eff_dt,
+a.PRIMARY_SIC_2,
+a.d_ee_premium_usd,
+a.d_ee_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= (case when a.plcy_eff_dt_P3 > @fixed_reference_date then @fixed_reference_date else a.plcy_eff_dt_P3 end) and a.plcy_eff_dt >= (case when a.plcy_eff_dt_P3 > @fixed_reference_date then dateadd(day, -1826, @fixed_reference_date) else a.CutoffDate5YR_P3 end) and a.PRIMARY_SIC_2 is not NULL
+a.PRIMARY_SIC_2 is not NULL
+as a
+group by PRIMARY_SIC_2
+select PRIMARY_SIC_2,
+coalesce(sum(d_ee_claim_cnt) / sum(d_ee_premium_usd),0) as SIC_2Digit_HLE_NotFreq_5YR_P4 into ##HLE_5_YR_SIC_2Digit_P4
+from
+select a.plcy_nbr,
+a.ilability,
+a.plcy_eff_dt,
+a.PRIMARY_SIC_2,
+a.d_ee_premium_usd,
+a.d_ee_claim_cnt
+from ##na_xs_duns as a
+where a.plcy_eff_dt <= (case when a.plcy_eff_dt_P4 › @fixed_reference_date then @fixed_reference_date else a.plcy_eff_dt_P4 end) and a.plcy_eff_dt >= (case when a plcy_eff_dt_P4 › @fixed_reference_date then dateadd(day, -1826, @fixed_reference_date) else a.CutoffDateSYR_P4 end)
+a.PRIMARY_SIC_2 is not NULL
+as a
+group by PRIMARY SIC 2
+and
+** Joining all variables together *****
+****/
+select PRIMARY_SIC_2,
+max(SIC 2Digit_HLE_Not Freq_5YR_P0) as SIC_2Digit_HLE_Not Freq_5YR_PO, max(SIC_2Digit_HLE_NotFreq_5YR_P1) as SIC_2Digit_HLE_Not Freq_5YR_P1, max(SIC_2Digit_HLE_NotFreq_5YR_P2) as SIC_2Digit_HLE_Not Freq_5YR_P2, max(SIC_2Digit_HLE_NotFreq 5YR_P3) as SIC_2Digit_HLE_Not Freq 5YR_P3, max(SIC_2Digit_HLE_Not Freq_SYR_P4) as SIC_2Digit_HLE_Not Freq_5YR_P4 into ##HLE_5_YR_SIC_2Digit_Lag from(
+from(
+select coalesce(coalesce(coalesce(coalesce (a.PRIMARY_SIC_2, b.PRIMARY_SIC_2), c. PRIMARY_SIC_2), d.PRIMARY_SIC_2), e.PRIMARY_SIC_2) as PRIMARY_SIC_2,
+coalesce(a.SIC_2Digit_HLE_NotFreq_5YR_P0, 0) as SIC_2Digit_HLE_NotFreq_5YR_PO, coalesce(b.SIC_2Digit_HLE_Not Freq_5YR_P1, 0) as SIC_2Digit_HLE_NotFreq_5YR_P1, coalesce(c.SIC_2Digit_HLE_NotFreq_5YR_P2, 0) as SIC_2Digit_HLE_Not Freq_5YR_P2, coalesce(d.SIC_2Digit_HLE_NotFreq_5YR_P3, 0) as SIC_2Digit_HLE_Not Freq_5YR_P3, coalesce(e.SIC_2Digit_HLE_Not Freq_5YR_P4, 0) as SIC_2Digit_HLE_Not Freq_5YR_P4 from ##HLE_5_YR_SIC_2Digit_PO as a
+full outer join ##HLE_5_YR_SIC_2Digit_P1 as b
+on a.PRIMARY_SIC_2 = b.PRIMARY SIC 2
+full outer join ##HLE_5_YR_SIC_2Digit_P2 as c on a PRIMARY_SIC_2 = C.PRIMARY_SIC_2
+full outer join ##HLE_5_YR_SIC_2Digit_P3 as d on a.PRIMARY_SIC_2 = d.PRIMARY_SIC_2 full outer join ##HLE_5_YR_SIC_2Digit_P4 as e on a.PRIMARY_SIC_2 = e.PRIMARY_SIC_2) as a group by PRIMARY_SIC_2
+select d_final_customerKey,
+max(HLE Gt1000Freq_5YR_PO) as HLE_Gt1000Freq_5YR_PO, max(HLE_Gt1000Freq_5YR_P1) as HLE_Gt1000Freq_5YR_P1, max(HLE Gt1000Freq_5YR_P2) as HLE_Gt1000Freq_5YR_P2, max(HLE Gt1000Freq_5YR_P3) as HLE_Gt1000Freq_5YR_P3, max(HLE_Gt1000Freq_5YR_P4) as HLE_Gt1000Freq_5YR_P4
+into ##HLE_5_YR_Lag
+from(
+select coalesce(coalesce (coalesce (coalesce (a.d_final_customerKey, b.d_final_customerKey), c.d_final_customerkey), d.d_final_customerKey), e.d_final_customerKey) as d_final_customerKey, coalesce(a.HLE_Gt1000Freq 5YR_P0, 0) as HLE_Gt1000Freq_5YR_PO, coalesce(b.HLE_Gt1000Freq_5YR_P1, 0) as HLE_Gt1000Freq_5YR_P1,
+coalesce (b.HLE_Gt1000Freq_5YR_P1, 0) as HLE_Gt1000Freq_5YR_P1, coalesce(c.HLE_Gt1000Freq_5YR_P2, 0) as HLE_Gt1000Freq_5YR_P2, coalesce(d.HLE_Gt1000Freq_5YR_P3, 0) as HLE_Gt1000Freq_5YR_P3, coalesce(e.HLE_Gt1000Freq_5YR_P4, 0) as HLE_Gt1000Freq_5YR_P4
+from ##HLE_5_YR_PO as a
+full outer join ##HLE_5_YR_P1 as b
+on a.d_final_customerKey = b.d_final_customerKey
+full outer join ##HLE_5_YR_P2 as c
+on a.d_final_customerkey = c.d_final_customerKey
+full outer join ##HLE_5_YR_P3 as d
+on a.d_final_customerKey= d.d_final_customerKey
+full outer join ##HLE_5_YR_P4 as e
+on a.d_final_customerKey = e.d_final_customerKey) as a
+group by d_final_customerKey
+drop table if exists NAExcess Casualty.Quart_Refresh_Policy_Cust_Number_Mapping_Lag,
+select *
+NAExcessCasualty.Quart_Refresh_Duns_Cust_Number_Mapping_Lag,
+NAExcessCasualty.Quart_Refresh_HLE_5_YR_Lag,
+NAExcessCasualty.Quart_Refresh_HLE_5_YR_SIC_2Digit_Lag,
+NAExcessCasualty.DNB_RAW_BRICK_CSAD_LAG
+into NAExcess Casualty.Quart_Refresh_Policy_Cust_Number_Mapping_Lag from ##Quart_Refresh_Policy_Cust_Number_Mapping
+select *
+into NAExcess Casualty.Quart_Refresh_Duns_Cust_Number Mapping
+from ##Quart_Refresh_Duns_Cust_Number_Mapping
+select *
+into NAExcess Casualty.Quart_Refresh_HLE_5_YR_Lag
+select *
+into NAExcess Casualty.Quart_Refresh_HLE_5_YR_Lag from ##HLE_5_YR_Lag
+select *
+into NAExcessCasualty.Quart_Refresh_HLE_5_YR_SIC_2Digit_Lag from ##HLE_5_YR_SIC_2Digit_Lag
+select *
+into NAExcessCasualty.DNB_RAW_BRICK_CSAD_LAG
+from
+(select [DUNS NUMBER]
+0 as DUNS YEAR
+FPCT
+CPCT
+SIC4
+UCCFILNG
+PEXP 30
+NEGDOLL1
+TOTEMPL
+NETWORTH
+SALES
+[BUSINESS NAME] AS BUSINESS NAME
+[STREET ADDRESS] AS STREET_ADDRESS
+[CITY NAME] AS CITY_NAME
+[STATE/PROVINCE ABBREVIATION] AS STATE_PROVINCE ABBREVIATION [POSTAL CODE] AS POSTAL CODE
+from ext.DNB_RAW_BRICK_CSAD_2021
+where DATEPLL = 'SEP21')
+union
+(select [DUNS NUMBER]
+1 as DUNS_YEAR
+FPCT
+CPCT
+SIC4
+UCCFILNG
+PEXP 30 NEGDOLL1 TOTEMPL
+NETWORTH
+SALES
+[BUSINESS NAME] AS BUSINESS_NAME
+[STREET ADDRESS] AS STREET ADDRESS
+[CITY NAME] AS CITY NAME
+[STATE/PROVINCE ABBREVIATION] AS STATE_PROVINCE ABBREVIATION
+[POSTAL CODE] AS POSTAL CODE
+from ext.DNB_RAW_BRICK_CSAD_2020 where DATEPLL = 1SEP201)
+union
+(select [DUNS NUMBER]
+2 as DUNS YEAR
+TOTEMPL NETWORTH
+SALES
+[BUSINESS NAME] AS BUSINESS_NAME
+[STREET ADDRESS] AS STREET_ADDRESS
+[CITY NAME] AS CITY NAME
+[STATE/PROVINCE ABBREVIATION] AS STATE_PROVINCE ABBREVIATION [POSTAL CODE] AS POSTAL CODE
+from ext.DNB_RAW_BRICK_CSAD_2019 where DATEPLL
+union
+SEP19")
+(select [DUNS NUMBER]
+3 as DUNS YEAR
+FPCT
+CPCT
+SIC4
+UCCFILNG
+PEXP_30
+NEGDOLL1
+TOTEMPL
+NETWORTH
+SALES
+, [BUSINESS NAME] AS BUSINESS NAME
+J
+[STREET ADDRESS] AS STREET_ADDRESS
+, [CITY NAME] AS CITY_NAME
+[STATE/PROVINCE ABBREVIATION] AS STATE_PROVINCE ABBREVIATION
+> [POSTAL CODE] AS POSTAL CODE
+from ext.DNB_RAW_BRICK_CSAD_2018
+where DATEPLL = 'SEP18')
+(select [DUNS NUMBER]
+union
+(select [DUNS NUMBER]
+4 as DUNS YEAR
+FPCT
+CPCT
+SIC4
+UCCFILNG
+PEXP 30 NEGDOLL1
+TOTEMPL NETWORTH
+SALES
+[BUSINESS NAME] AS BUSINESS_NAME
+[STREET ADDRESS] AS STREET ADDRESS
+Ready
+Type here to search
+[CITY NAME] AS CITY_NAME
+[STATE/PROVINCE ABBREVIATION] AS STATE_PROVINCE_ABBREVIATION
+[POSTAL CODE] AS POSTAL CODE
+from ext.DNB_RAW_BRICK_CSAD_2017 where DATEPLL = "SEP17)
+) as a
+drop index if exists NAExcess Casualty.DNB_RAW_BRICK_CSAD_LAG.duns_index_lag;
+create nonclustered index duns_index_lag
+on NAExcessCasualty.DNB_RAW_BRICK_CSAD_LAG ([DUNS NUMBER]);
+
+
